@@ -47,8 +47,8 @@ public class FileResource {
 
     @GET
     @Produces({MediaType.APPLICATION_OCTET_STREAM})
-    @Path("get")
-    public Response getFile() {
+    @Path("download")
+    public Response downloadFile() {
 
         final SingleFile singleFile = FileSingleton.INSTANCE.getOne(0);
         System.out.println(singleFile.getSize());
