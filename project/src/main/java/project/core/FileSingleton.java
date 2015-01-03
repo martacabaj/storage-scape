@@ -16,10 +16,11 @@ public enum FileSingleton {
     public SingleFile getOne(Integer id){
         return files.get(id);
     }
-    public void create(SingleFile file){
+    public int create(SingleFile file){
 
         int newId= files.size();
-
+file.setId(newId);
         files.put(newId, file);
+        return newId;
     }
 }

@@ -1,6 +1,7 @@
 package project.core;
 
-import java.io.File;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * Created by Marta on 2015-01-01.
@@ -8,17 +9,28 @@ import java.io.File;
 public class SingleFile {
     String name;
     long size;
-    byte[] fileBytes;
+    byte[] fileBytesArray;
+    int folderId;
+    Integer id;
+
     public SingleFile() {
     }
 
-    public SingleFile(String name,  byte[] byteArray) {
+    public SingleFile(String name,  byte[] fileBytesArray) {
 
         this.name = name;
-        this.size = byteArray.length;
-        this.fileBytes = byteArray;
+        this.size = fileBytesArray.length;
+        this.fileBytesArray = fileBytesArray;
     }
 
+    public SingleFile(String name, byte[] fileBytesArray, int folderId) {
+        this.name = name;
+        this.fileBytesArray = fileBytesArray;
+        this.folderId = folderId;
+        this.size = fileBytesArray.length;
+    }
+
+    @XmlElement
     public String getName() {
         return name;
     }
@@ -26,7 +38,7 @@ public class SingleFile {
     public void setName(String name) {
         this.name = name;
     }
-
+    @XmlElement
     public long getSize() {
         return size;
     }
@@ -35,11 +47,28 @@ public class SingleFile {
         this.size = size;
     }
 
-    public byte[] getFileBytes() {
-        return fileBytes;
+    public byte[] getFileBytesArray() {
+        return fileBytesArray;
     }
 
-    public void setFileBytes(byte[] fileBytes) {
-        this.fileBytes = fileBytes;
+    public void setFileBytesArray(byte[] fileBytesArray) {
+        this.fileBytesArray = fileBytesArray;
+    }
+    @XmlAttribute
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    @XmlElement
+    public int getFolderId() {
+        return folderId;
+    }
+
+    public void setFolderId(int folderId) {
+        this.folderId = folderId;
     }
 }
