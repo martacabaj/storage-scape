@@ -9,14 +9,12 @@ import project.core.StorageService;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import javax.ws.rs.DELETE;
 /**
  * Created by Marta on 2015-01-02.
  */
-@Path("file")
+@Path("/file")
 public class FileResource {
   /*  private final StorageService storageService;
     public FileResource(StorageService storageService) {
@@ -27,30 +25,42 @@ public class FileResource {
     }*/
 
     @POST
-    @Path("upload")
+    @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.TEXT_PLAIN)
-    public String uploadFile(
-            @FormDataParam("file") InputStream fileInputStream,
-            @FormDataParam("file") FormDataContentDisposition fileDisposition) {
+    public Response uploadFile(
+            @FormDataParam("file") InputStream uploadedInputStream,
+            @FormDataParam("file") FormDataContentDisposition fileDetail) {
 
-        String fileName = fileDisposition.getFileName();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int read = 0;
-        final byte[] bytes = new byte[1024];
+        String uploadedFileLocation = "C://" + fileDetail.getFileName();
+
+        writeToFile(uploadedInputStream, uploadedFileLocation);
+
+        String output = "File uploaded to : " + uploadedFileLocation;
+
+        return Response.status(200).entity(output).build();
+
+    }
+
+    private void writeToFile(InputStream uploadedInputStream,
+                             String uploadedFileLocation) {
+
         try {
-            while ((read = fileInputStream.read(bytes)) != -1) {
-                buffer.write(bytes, 0, read);
+            OutputStream out = new FileOutputStream(new File(
+                    uploadedFileLocation));
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            out = new FileOutputStream(new File(uploadedFileLocation));
+            while ((read = uploadedInputStream.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
             }
-            fileInputStream.close();
+            out.flush();
+            out.close();
         } catch (IOException e) {
+
             e.printStackTrace();
         }
 
-        final SingleFile file = new SingleFile(fileName, buffer.toByteArray());
-        FileSingleton.INSTANCE.create(file);
-
-        return "File Upload Successfully !!";
     }
 
     @GET

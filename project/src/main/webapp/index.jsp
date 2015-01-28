@@ -1,6 +1,6 @@
 <html>
 <body>
-<h1>File Upload with Jersey</h1>
+<h1>Upload file</h1>
 
 <form action="webapi/file/upload" method="post" enctype="multipart/form-data">
 
