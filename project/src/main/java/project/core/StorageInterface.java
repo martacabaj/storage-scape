@@ -11,13 +11,14 @@ public interface StorageInterface {
     Integer addFile(SingleFile singleFile);
     Integer addFile(SingleFile singleFile, int folderId);
     Integer addFolder(Folder folder);
-    Collection<SingleFile> getAllFiles();
-    Collection<SingleFile> getAllFilesFromFolder(int folderId);
-    Collection<Folder> getAllFolders();
-    SingleFile getOneFile(Integer id);
+    Collection<SingleFile> getAllFiles( String user);
+    Collection<SingleFile> getAllFilesFromFolder(int folderId, String user);
+    Collection<Folder> getAllFolders( String user);
+    SingleFile getOneFile(Integer id, String user);
     Folder getOneFolder();
-    void deleteFolder(Integer folderId);
-    void deleteFile(Integer file);
-    void updateFolder(Folder folder);
+    void deleteFolder(Integer folderId, String user);
+    void deleteFile(Integer file, String user);
+    void updateFolder(Folder folder, String user);
+    long getFreeScape(String user);
 
 }

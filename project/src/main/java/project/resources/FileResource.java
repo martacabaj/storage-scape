@@ -2,19 +2,15 @@ package project.resources;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import project.core.FileSingleton;
 import project.core.SingleFile;
 import project.core.StorageService;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.core.SecurityContext;
 
 /**
  * Created by Marta on 2015-01-02.
@@ -22,6 +18,7 @@ import javax.ws.rs.core.SecurityContext;
 @Path("file")
 public class FileResource {
     private final StorageService storageService;
+
     public FileResource(StorageService storageService) {
         this.storageService = storageService;
     }
@@ -36,11 +33,15 @@ public class FileResource {
     @Path("upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-    public Integer uploadFile(
+    public Response uploadFile(
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition fileDisposition,
             @FormDataParam("name") String name) {
-
+if(fileInputStream==null){
+    throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
+            .entity("No file")
+            .build());
+}
         String fileName = fileDisposition.getFileName();
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int read = 0;
@@ -54,29 +55,49 @@ public class FileResource {
             e.printStackTrace();
         }
 
-        final SingleFile file = new SingleFile(fileName, buffer.toByteArray(),name);
+        final SingleFile file = new SingleFile(fileName, buffer.toByteArray(), name);
         //FileSingleton.INSTANCE.create(file);
-
-        return storageService.addFile(file);
+        Integer id;
+        try {
+            id = storageService.addFile(file);
+        } catch (IllegalArgumentException e) {
+            throw new WebApplicationException(Response.status(Response.Status.REQUEST_ENTITY_TOO_LARGE)
+                    .entity(e.getMessage())
+                    .build());
+        }
+        return Response.ok(id).build();
     }
 
     @GET
     @Produces({MediaType.APPLICATION_OCTET_STREAM})
-    @Path("download")
-    public Response downloadFile() {
+    @Path("{id}/{user}")
+    public Response downloadFile(@PathParam("id") Integer id, @PathParam("user") String user) {
 
-        final SingleFile singleFile = FileSingleton.INSTANCE.getOne(0);
-        System.out.println(singleFile.getSize());
-        return Response
-                .ok(singleFile.getFileBytesArray(), MediaType.APPLICATION_OCTET_STREAM)
-                .header("content-disposition", "attachment; filename = " + singleFile.getName())
-                .build();
+        try {
+            SingleFile singleFile = storageService.getFile(id, user);
+            // System.out.println(singleFile.getSize());
+            return Response
+                    .ok(singleFile.getFileBytesArray(), MediaType.APPLICATION_OCTET_STREAM)
+                    .header("content-disposition", "attachment; filename = " + singleFile.getName())
+                    .build();
+        } catch (NullPointerException e) {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .build());
+        }
     }
+
     @DELETE
-    @Path("{id}")
-    public Response deleteFile(@PathParam("id")Integer id){
-        //TODO delete file
-        return Response.noContent().build();
+    @Path("{id}/{user}")
+    public Response deleteFile(@PathParam("id") Integer id, @PathParam("user") String user) {
+        try {
+            storageService.deleteFile(id, user);
+        } catch (Exception e) {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .build());
+        }
+        return Response.ok().build();
     }
 
 }
