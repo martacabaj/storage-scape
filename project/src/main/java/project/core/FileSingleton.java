@@ -19,7 +19,7 @@ public enum FileSingleton {
     public int create(SingleFile file){
 
         int newId= files.size();
-file.setId(newId);
+        file.setId(newId);
         files.put(newId, file);
         return newId;
     }

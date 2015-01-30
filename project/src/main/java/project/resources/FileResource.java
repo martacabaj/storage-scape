@@ -7,22 +7,28 @@ import project.core.SingleFile;
 import project.core.StorageService;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.core.SecurityContext;
+
 /**
  * Created by Marta on 2015-01-02.
  */
 @Path("file")
 public class FileResource {
-  /*  private final StorageService storageService;
+    private final StorageService storageService;
     public FileResource(StorageService storageService) {
         this.storageService = storageService;
     }
-*/
+//    public FileResource(){
+//
+//    }
+
     /*public FileResource() {
     }*/
 
@@ -30,9 +36,10 @@ public class FileResource {
     @Path("upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-    public String uploadFile(
+    public Integer uploadFile(
             @FormDataParam("file") InputStream fileInputStream,
-            @FormDataParam("file") FormDataContentDisposition fileDisposition) {
+            @FormDataParam("file") FormDataContentDisposition fileDisposition,
+            @FormDataParam("name") String name) {
 
         String fileName = fileDisposition.getFileName();
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -47,10 +54,10 @@ public class FileResource {
             e.printStackTrace();
         }
 
-        final SingleFile file = new SingleFile(fileName, buffer.toByteArray());
-        FileSingleton.INSTANCE.create(file);
+        final SingleFile file = new SingleFile(fileName, buffer.toByteArray(),name);
+        //FileSingleton.INSTANCE.create(file);
 
-        return "File Upload Successfully !!";
+        return storageService.addFile(file);
     }
 
     @GET

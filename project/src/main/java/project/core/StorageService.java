@@ -12,6 +12,8 @@ public class StorageService {
     public StorageService(StorageInterface storage) {
         this.storage = storage;
     }
-
+public Integer addFile(SingleFile singleFile){
+return storage.addFile(singleFile);
+}
 
 }
