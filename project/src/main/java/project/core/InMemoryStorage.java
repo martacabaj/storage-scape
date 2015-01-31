@@ -33,6 +33,8 @@ public class InMemoryStorage implements StorageInterface {
 
     }
 
+
+
     @Override
     public Integer addFile(SingleFile singleFile) {
 
@@ -60,7 +62,9 @@ public class InMemoryStorage implements StorageInterface {
         Integer id = idCounterFile.incrementAndGet();
         singleFile.setId(id);
         singleFile.setFolderId(folderId);
-        files.putIfAbsent(id, singleFile);
+
+            files.putIfAbsent(id, singleFile);
+
         return id;
     }
 
