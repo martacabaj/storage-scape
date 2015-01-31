@@ -14,8 +14,9 @@ public class Folder {
 
     public Folder() {
     }
-    public Folder(String name) {
+    public Folder(String name, String owner) {
         this.name = name;
+        this.owner = owner;
     }
     @XmlAttribute
     public String getName() {

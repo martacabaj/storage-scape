@@ -104,4 +104,16 @@ public class SingleFile {
     public void setSharedUsers(Set<String> sharedUsers) {
         this.sharedUsers = sharedUsers;
     }
+
+
+    @Override
+    public String toString() {
+        return "SingleFile{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", folderId='" + folderId + '\'' +
+                ", size=" + size +'\'' +
+                ", owner='" + owner +
+                '}';
+    }
 }
