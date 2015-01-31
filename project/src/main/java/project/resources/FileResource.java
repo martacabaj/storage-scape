@@ -53,10 +53,10 @@ public class FileResource {
 
 
     @POST
-    @Path("upload/id")
+    @Path("upload/{id}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response uploadFile(@Context UriInfo uriInfo,
+    public Response uploadFileToFolder(@Context UriInfo uriInfo,
                                @PathParam("id") Integer folderId,
                                @FormDataParam("file") InputStream fileInputStream,
                                @FormDataParam("file") FormDataContentDisposition fileDisposition,
