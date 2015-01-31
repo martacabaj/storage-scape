@@ -1,11 +1,13 @@
 package project.core;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.*;
 import java.util.Set;
 
 /**
  * Created by Marta on 2015-01-01.
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public class Folder {
     String name;
     Integer id;
@@ -18,7 +20,7 @@ public class Folder {
         this.name = name;
         this.owner = owner;
     }
-    @XmlAttribute
+    @XmlElement
     public String getName() {
         return name;
     }
@@ -27,6 +29,7 @@ public class Folder {
         this.name = name;
     }
 
+    @XmlAttribute
     public Integer getId() {
         return id;
     }
@@ -34,7 +37,7 @@ public class Folder {
     public void setId(Integer id) {
         this.id = id;
     }
-
+    @XmlElement
     public String getOwner() {
         return owner;
     }
@@ -42,7 +45,8 @@ public class Folder {
     public void setOwner(String owner) {
         this.owner = owner;
     }
-
+    @XmlElementWrapper(name="shared-users")
+    @XmlElement
     public Set<String> getSharedUsers() {
         return sharedUsers;
     }
