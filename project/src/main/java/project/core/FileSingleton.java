@@ -1,6 +1,6 @@
 package project.core;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader;
+import project.core.dataClasses.SingleFile;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +19,7 @@ public enum FileSingleton {
     public int create(SingleFile file){
 
         int newId= files.size();
-file.setId(newId);
+        file.setId(newId);
         files.put(newId, file);
         return newId;
     }

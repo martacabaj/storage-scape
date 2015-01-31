@@ -10,17 +10,39 @@
             <param-value>project</param-value>
         </init-param>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
-            <param-value>project.config.ApplicationConfig</param-value>
+            <param-name>jersey.config.server.provider.classnames</param-name>
+            <param-value>org.glassfish.jersey.media.multipart.MultiPartFeature</param-value>
         </init-param>
-      <!--  <init-param>
-            <param-name>javax.ws.rs.ResourceConfig</param-name>
+       <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
             <param-value>project.config.ApplicationResourceConfig</param-value>
-        </init-param>-->
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/webapi/*</url-pattern>
     </servlet-mapping>
+
+    <!-- allow only users that belong to cr-users role -->
+    <security-constraint>
+        <display-name>Authentication Constraint</display-name>
+        <web-resource-collection>
+            <web-resource-name>CarRental REST service</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>cr-user</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-role>
+        <description>Regular user</description>
+        <role-name>cr-user</role-name>
+    </security-role>
+
+    <!-- forcing DIGEST authentication -->
+    <login-config>
+        <auth-method>DIGEST</auth-method>
+        <realm-name>Sample_Realm</realm-name>
+    </login-config>
 </web-app>
