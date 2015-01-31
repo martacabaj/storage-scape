@@ -19,8 +19,8 @@ public class ApplicationResourceConfig extends ResourceConfig {
 
         StorageService storageService = new StorageService(storage);
 
-       register(new FileResource(storageService));
-        //register(new FolderResource(storageService));
+        register(new FileResource(storageService));
+        register(new FolderResource(storageService));
 
 
         // setting a package that contains the REST resource classes

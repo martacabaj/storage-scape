@@ -57,7 +57,7 @@ public class InMemoryStorage implements StorageInterface {
 
     @Override
     public Integer addFolder(Folder folder) {
-        Integer id = idCounterFile.incrementAndGet();
+        Integer id = idCounterFolder.incrementAndGet();
         folder.setId(id);
 
         folders.putIfAbsent(id, folder);
