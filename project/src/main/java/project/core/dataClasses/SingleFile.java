@@ -103,7 +103,9 @@ public class SingleFile {
         this.sharedUsers = sharedUsers;
     }
 
-
+public void addSharedUser(String username){
+    sharedUsers.add(username);
+}
     @Override
     public String toString() {
         return "SingleFile{" +

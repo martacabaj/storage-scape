@@ -3,15 +3,17 @@ package project.resources;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import project.core.StorageService;
+import project.core.dataClasses.SingleFile;
+import project.core.dataClasses.User;
 import project.core.exceptions.FileNotFoundException;
 import project.core.exceptions.FolderNotFoundException;
-import project.core.dataClasses.SingleFile;
-import project.core.StorageService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created by Marta on 2015-01-02.
@@ -25,39 +27,46 @@ public class FileResource {
     }
 
 
-
     @POST
     @Path("upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-
-        public Response uploadFile(@Context UriInfo uriInfo,
-                @FormDataParam("file") InputStream fileInputStream,
-                @FormDataParam("file") FormDataContentDisposition fileDisposition,
-                @FormDataParam("name") String name) {
-            final SingleFile file = storageService.readFile(fileInputStream, fileDisposition, name);
-            Integer id;
-            id = storageService.addFile(file);
-
-            return Response.created(
-                    UriBuilder.fromUri(uriInfo.getRequestUri())
-                            .path(id.toString())
-                            .build())
-                    .build();
+    public Response uploadFile(@Context UriInfo uriInfo,
+                               @FormDataParam("file") InputStream fileInputStream,
+                               @FormDataParam("file") FormDataContentDisposition fileDisposition,
+                               @Context SecurityContext sc) {
+        if (fileInputStream == null) {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
+                    .entity("No file")
+                    .build());
         }
+        final SingleFile file = storageService.readFile(fileInputStream, fileDisposition, sc.getUserPrincipal().getName());
+        Integer id;
+        id = storageService.addFile(file);
 
+        return Response.created(
+                UriBuilder.fromUri(uriInfo.getRequestUri())
+                        .path(id.toString())
+                        .build())
+                .build();
+    }
 
 
     @POST
-    @Path("upload/{id}")
+    @Path("upload/id")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
     public Response uploadFile(@Context UriInfo uriInfo,
                                @PathParam("id") Integer folderId,
                                @FormDataParam("file") InputStream fileInputStream,
                                @FormDataParam("file") FormDataContentDisposition fileDisposition,
-                               @FormDataParam("name") String name) {
-        final SingleFile file = storageService.readFile(fileInputStream, fileDisposition, name);
+                               @Context SecurityContext sc) {
+        if (fileInputStream == null) {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
+                    .entity("No file")
+                    .build());
+        }
+        final SingleFile file = storageService.readFile(fileInputStream, fileDisposition, sc.getUserPrincipal().getName());
         Integer id;
         id = storageService.addFile(file, folderId);
 
@@ -67,13 +76,14 @@ public class FileResource {
                         .build())
                 .build();
     }
+
     @GET
     @Produces({MediaType.APPLICATION_OCTET_STREAM})
-    @Path("download/{id}/{user}")
-    public Response downloadFile(@PathParam("id") Integer id, @PathParam("user") String user) {
+    @Path("download/{id}")
+    public Response downloadFile(@PathParam("id") Integer id, @Context SecurityContext sc) {
 
         try {
-            SingleFile singleFile = storageService.getFile(id, user);
+            SingleFile singleFile = storageService.getFile(id, sc.getUserPrincipal().getName());
 
             return Response
                     .ok(singleFile.getFileBytesArray(), MediaType.APPLICATION_OCTET_STREAM)
@@ -85,13 +95,14 @@ public class FileResource {
     }
 
     @GET
-    @Path("info/{id}/{user}")
+    @Path("info/{id}")
     @Produces({"application/xml", "application/json"})
-    public Response getFile(@PathParam("id") int id, @PathParam("user") String user, @Context Request request) {
-        final SingleFile file = storageService.getFile(id, user);
+    public Response getFile(@PathParam("id") int id, @Context SecurityContext sc, @Context Request request) {
+        final SingleFile file = storageService.getFile(id, sc.getUserPrincipal().getName());
         if (file == null) {
             throw new FileNotFoundException(id);
         }
+
         CacheControl cacheControl = new CacheControl();
         cacheControl.setMaxAge(10);
         EntityTag entityTag = new EntityTag(computeTag(file));
@@ -106,11 +117,11 @@ public class FileResource {
     }
 
     @GET
-    @Path("info/{user}")
+    @Path("info")
     @Produces({"application/xml", "application/json"})
-    public Response getFiles(@PathParam("user") String user, @Context Request request, @MatrixParam("fileName") String fileName) {
+    public Response getFiles(@Context SecurityContext sc, @Context Request request, @MatrixParam("fileName") String fileName) {
         final Response.ResponseBuilder rb = Response.ok();
-
+        String user = sc.getUserPrincipal().getName();
         if (StringUtils.isEmpty(fileName)) {
             rb.entity(new GenericEntity<Collection<SingleFile>>(storageService.getFiles(user)) {
             });
@@ -127,9 +138,10 @@ public class FileResource {
     }
 
     @GET
-    @Path("folder/{id}/{user}")
+    @Path("folder/{id}")
     @Produces({"application/xml", "application/json"})
-    public Response getFileFromFolder(@PathParam("id") Integer id, @PathParam("user") String user) {
+    public Response getFileFromFolder(@PathParam("id") Integer id,@Context SecurityContext sc) {
+        String user = sc.getUserPrincipal().getName();
         Collection<SingleFile> files = storageService.getFilesFromFolder(id, user);
         if (files == null) {
             throw new FolderNotFoundException(id);
@@ -137,21 +149,35 @@ public class FileResource {
         final Response.ResponseBuilder rb = Response.ok();
         rb.entity(new GenericEntity<Collection<SingleFile>>(files) {
         });
+
+
+
         return rb.build();
     }
 
 
     @DELETE
-    @Path("{id}/{user}")
-    public Response deleteFile(@PathParam("id") Integer id, @PathParam("user") String user) {
+    @Path("{id}")
+    public Response deleteFile(@PathParam("id") Integer id, @Context SecurityContext sc) {
         try {
-            storageService.deleteFile(id, user);
+            storageService.deleteFile(id, sc.getUserPrincipal().getName());
         } catch (Exception e) {
             throw new FileNotFoundException(id);
         }
         return Response.ok().build();
     }
-
+    @PUT
+    @Path("/share/{id}")
+    @Consumes({"application/xml", "application/json"})
+    public Response shareFile(@PathParam("id")Integer fileId, @Context SecurityContext sc, Set<User> sharedUsers, @Context UriInfo uriInfo,
+                              @Context Request request){
+        storageService.shareFile(fileId, sc.getUserPrincipal().getName(), sharedUsers);
+                              return Response.created(
+            UriBuilder.fromUri(uriInfo.getRequestUri())
+            .path(fileId.toString())
+            .build())
+            .build();
+    }
     private String computeTag(SingleFile file) {
         return file.hashCode() + "";
     }

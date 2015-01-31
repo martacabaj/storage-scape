@@ -3,10 +3,11 @@ package project.resources;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import project.core.dataClasses.Folder;
 import project.core.StorageService;
+import project.core.dataClasses.User;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
+import java.util.Set;
 
 /**
  * Created by Marta on 2015-01-03.
@@ -49,4 +50,18 @@ public class FolderResource {
         }
         return Response.ok().build();
     }
+
+
+  /*  @PUT
+    @Path("/share/{id}")
+    @Consumes({"application/xml", "application/json"})
+    public Response shareFolder(@PathParam("id")Integer folderId, @Context SecurityContext sc, Set<User> sharedUsers, @Context UriInfo uriInfo,
+                              @Context Request request){
+        storageService.shareFolder(folderId, sc.getUserPrincipal().getName(), sharedUsers);
+        return Response.created(
+                UriBuilder.fromUri(uriInfo.getRequestUri())
+                        .path(folderId.toString())
+                        .build())
+                .build();
+    }*/
 }

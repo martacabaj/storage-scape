@@ -1,5 +1,7 @@
 package project.core.dataClasses;
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader;
+
 import javax.xml.bind.annotation.*;
 import java.util.Set;
 
@@ -50,7 +52,9 @@ public class Folder {
     public Set<String> getSharedUsers() {
         return sharedUsers;
     }
-
+    public void addSharedUser(String username){
+        sharedUsers.add(username);
+    }
     public void setSharedUsers(Set<String> sharedUsers) {
         this.sharedUsers = sharedUsers;
     }

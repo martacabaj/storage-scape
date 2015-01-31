@@ -7,14 +7,15 @@ import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import project.core.dataClasses.Folder;
 import project.core.dataClasses.SingleFile;
+import project.core.dataClasses.User;
+import project.core.exceptions.FileNotFoundException;
 import project.core.exceptions.NoFreeSpaceException;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created by Marta on 2015-01-01.
@@ -30,11 +31,7 @@ public class StorageService {
     public SingleFile readFile(InputStream fileInputStream,
                                FormDataContentDisposition fileDisposition,
                                String name) {
-        if (fileInputStream == null) {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
-                    .entity("No file")
-                    .build());
-        }
+
         String fileName = fileDisposition.getFileName();
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int read = 0;
@@ -83,10 +80,7 @@ public class StorageService {
 
     public SingleFile getFile(Integer id, String user) {
         SingleFile file = storage.getOneFile(id, user);
-        if (file == null) {
 
-            throw new NullPointerException("No file with given id");
-        }
         return file;
     }
 
@@ -140,5 +134,13 @@ public class StorageService {
         }
     }
 
-  
+    public void shareFile(Integer fileId, String owner, Set<User> users) {
+        try {
+            storage.shareFile(fileId, owner, users);
+        } catch (FileNotFoundException e) {
+            throw e;
+        }
+    }
+
+
 }

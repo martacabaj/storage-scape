@@ -3,6 +3,8 @@ package project.core;
 import edu.emory.mathcs.backport.java.util.Collections;
 import project.core.dataClasses.Folder;
 import project.core.dataClasses.SingleFile;
+import project.core.dataClasses.User;
+import project.core.exceptions.FileNotFoundException;
 import project.core.exceptions.FolderNotFoundException;
 import project.core.exceptions.NoFreeSpaceException;
 
@@ -33,13 +35,11 @@ public class InMemoryStorage implements StorageInterface {
 
     }
 
-
-
     @Override
     public Integer addFile(SingleFile singleFile) {
 
-        long freeSpace =getFreeScape(singleFile.getOwner());
-        if(freeSpace<singleFile.getSize()){
+        long freeSpace = getFreeScape(singleFile.getOwner());
+        if (freeSpace < singleFile.getSize()) {
             throw new NoFreeSpaceException();
         }
 
@@ -51,11 +51,11 @@ public class InMemoryStorage implements StorageInterface {
 
     @Override
     public Integer addFile(SingleFile singleFile, int folderId) {
-        long freeSpace =getFreeScape(singleFile.getOwner());
-        if(freeSpace<singleFile.getSize()){
+        long freeSpace = getFreeScape(singleFile.getOwner());
+        if (freeSpace < singleFile.getSize()) {
             throw new NoFreeSpaceException();
         }
-        if(!checkIfFolderExists(folderId, singleFile.getOwner())){
+        if (!checkIfFolderExists(folderId, singleFile.getOwner())) {
             throw new FolderNotFoundException(folderId);
         }
 
@@ -63,7 +63,7 @@ public class InMemoryStorage implements StorageInterface {
         singleFile.setId(id);
         singleFile.setFolderId(folderId);
 
-            files.putIfAbsent(id, singleFile);
+        files.putIfAbsent(id, singleFile);
 
         return id;
     }
@@ -78,11 +78,11 @@ public class InMemoryStorage implements StorageInterface {
     }
 
     @Override
-    public Collection<SingleFile> getAllFiles( String user) {
+    public Collection<SingleFile> getAllFiles(String user) {
         Set<SingleFile> filesToReturn = new HashSet<SingleFile>();
-        for(SingleFile file : files.values()){
+        for (SingleFile file : files.values()) {
             String owner = file.getOwner();
-            if (owner.equals(user)){
+            if (owner.equals(user)) {
                 filesToReturn.add(file);
             }
         }
@@ -90,8 +90,8 @@ public class InMemoryStorage implements StorageInterface {
     }
 
     @Override
-    public Collection<SingleFile> getAllFilesFromFolder(int folderId,  String user) {
-        if(!checkIfFolderExists(folderId, user)){
+    public Collection<SingleFile> getAllFilesFromFolder(int folderId, String user) {
+        if (!checkIfFolderExists(folderId, user)) {
             return null;
         }
         if (files.isEmpty()) {
@@ -101,7 +101,7 @@ public class InMemoryStorage implements StorageInterface {
         for (SingleFile file : files.values()) {
             String owner = file.getOwner();
 
-            if (file.getFolderId() == folderId &&owner.equals(user) ) {
+            if (file.getFolderId() == folderId && owner.equals(user)) {
                 filesFromFolder.add(file);
             }
         }
@@ -109,12 +109,12 @@ public class InMemoryStorage implements StorageInterface {
     }
 
     @Override
-    public Collection<Folder> getAllFolders( String user) {
-        Set<Folder> foldersToReturn= new HashSet<Folder>();
+    public Collection<Folder> getAllFolders(String user) {
+        Set<Folder> foldersToReturn = new HashSet<Folder>();
 
-        for(Folder folder : folders.values()){
+        for (Folder folder : folders.values()) {
             String owner = folder.getOwner();
-            if (owner.equals(user)){
+            if (owner.equals(user)) {
                 foldersToReturn.add(folder);
             }
         }
@@ -124,26 +124,31 @@ public class InMemoryStorage implements StorageInterface {
 
     @Override
     public SingleFile getOneFile(Integer id, String user) {
-        String owner = files.get(id).getOwner();
-       if (owner.equals(user))
-            return files.get(id);
-        else
+        if (files.containsKey(id)) {
+            String owner = files.get(id).getOwner();
+            if (owner.equals(user))
+                return files.get(id);
+        }
         return null;
 
     }
 
     @Override
-    public Folder getOneFolder() {
+    public Folder getOneFolder(Integer id, String user) {
+        if (folders.containsKey(id)) {
+            String owner = folders.get(id).getOwner();
+            if (owner.equals(user))
+                return folders.get(id);
+        }
         return null;
     }
 
     @Override
     public void deleteFolder(Integer folderId, String user) {
         String owner = folders.get(folderId).getOwner();
-        if (owner.equals(user)){
+        if (owner.equals(user)) {
             folders.remove(folderId);
-        }
-        else{
+        } else {
             throw new IllegalArgumentException("User has no folder with this id");
         }
 
@@ -157,11 +162,11 @@ public class InMemoryStorage implements StorageInterface {
     @Override
     public void deleteFile(Integer file, String user) {
         String owner = files.get(file).getOwner();
-        if (owner.equals(user)){
+        if (owner.equals(user)) {
             files.remove(file);
-        return;
-        }else {
-           throw new IllegalArgumentException("User has no file with this id");
+            return;
+        } else {
+            throw new IllegalArgumentException("User has no file with this id");
         }
     }
 
@@ -169,7 +174,7 @@ public class InMemoryStorage implements StorageInterface {
     public void updateFolder(Folder folder, String user) {
         if (null == folder.getId()) {
             throw new IllegalArgumentException("Folder has no id");
-        }else if(folder.getOwner()==user){
+        } else if (folder.getOwner() == user) {
             throw new IllegalArgumentException("User has no folder with this id");
         }
         folders.put(folder.getId(), folder);
@@ -190,12 +195,50 @@ public class InMemoryStorage implements StorageInterface {
     public Boolean checkIfFolderExists(int folderId, String user) {
         if (!folders.containsKey(folderId)) {
             return false;
-        }else{
+        } else {
             String owner = folders.get(folderId).getOwner();
-            if (!owner.equals(user) ) {
+            if (!owner.equals(user)) {
                 return false;
-            }else{
+            } else {
                 return true;
+            }
+        }
+    }
+
+    @Override
+    public void shareFile(Integer fileId, String owner, Set<User> users) {
+        if (!files.containsKey(fileId)) {
+            throw new FileNotFoundException(fileId);
+        } else {
+            SingleFile file = files.get(fileId);
+            String fileOwner = file.getOwner();
+            if (fileOwner.equals(owner)) {
+                for (User user : users) {
+                    file.addSharedUser(user.getUsername());
+                }
+            } else {
+                throw new FileNotFoundException(fileId);
+            }
+        }
+    }
+
+    @Override
+    public void shareFolder(Integer folderId, String owner, Set<User> users) {
+        if (!folders.containsKey(folderId)) {
+            throw new FolderNotFoundException(folderId);
+        } else {
+            Folder folder = folders.get(folderId);
+            String fileOwner = folder.getOwner();
+            if (fileOwner.equals(owner)) {
+                for (User user : users) {
+
+                    folder.addSharedUser(user.getUsername());
+                    for(SingleFile file : files.values()){
+
+                    }
+                }
+            } else {
+                throw new FileNotFoundException(folderId);
             }
         }
     }
