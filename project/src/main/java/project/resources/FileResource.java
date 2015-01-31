@@ -1,5 +1,6 @@
 package project.resources;
 
+import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import project.core.FileNotFoundException;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 /**
  * Created by Marta on 2015-01-02.
@@ -99,6 +101,27 @@ public class FileResource {
                     .build();
         }
         return Response.ok(file).cacheControl(cacheControl).tag(entityTag).build();
+    }
+
+    @GET
+    @Path("info/{user}")
+    @Produces({"application/xml", "application/json"})
+    public Response getFilesInfo(@PathParam("user") String user, @Context Request request,  @MatrixParam("fileName") String fileName) {
+        final Response.ResponseBuilder rb = Response.ok();
+
+        if (StringUtils.isEmpty(fileName)) {
+            rb.entity(new GenericEntity<Collection<SingleFile>>(storageService.getFiles(user)) {
+            });
+
+        } else {
+            rb.entity(
+                    new GenericEntity<Collection<SingleFile>>(
+                            storageService.getFilesFilteredBy(user, fileName)) {
+                    });
+        }
+
+
+        return rb.build();
     }
 
 
