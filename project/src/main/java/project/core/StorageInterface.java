@@ -20,5 +20,6 @@ public interface StorageInterface {
     void deleteFile(Integer file, String user);
     void updateFolder(Folder folder, String user);
     long getFreeScape(String user);
+    Boolean checkIfFolderExists(int folderId, String user);
 
 }

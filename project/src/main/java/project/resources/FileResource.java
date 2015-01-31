@@ -10,8 +10,6 @@ import project.core.StorageService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
@@ -31,41 +29,40 @@ public class FileResource {
     @Path("upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response uploadFile(
-            @FormDataParam("file") InputStream fileInputStream,
-            @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @FormDataParam("name") String name) {
-        if (fileInputStream == null) {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
-                    .entity("No file")
-                    .build());
-        }
-        String fileName = fileDisposition.getFileName();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int read = 0;
-        final byte[] bytes = new byte[1024];
-        try {
-            while ((read = fileInputStream.read(bytes)) != -1) {
-                buffer.write(bytes, 0, read);
-            }
-            fileInputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        final SingleFile file = new SingleFile(fileName, buffer.toByteArray(), name);
-
+    public Response uploadFile(@Context UriInfo uriInfo,
+                               @FormDataParam("file") InputStream fileInputStream,
+                               @FormDataParam("file") FormDataContentDisposition fileDisposition,
+                               @FormDataParam("name") String name) {
+        final SingleFile file = storageService.readFile(fileInputStream, fileDisposition, name);
         Integer id;
-        try {
-            id = storageService.addFile(file);
-        } catch (IllegalArgumentException e) {
-            throw new WebApplicationException(Response.status(Response.Status.REQUEST_ENTITY_TOO_LARGE)
-                    .entity(e.getMessage())
-                    .build());
-        }
-        return Response.ok(id).build();
+        id = storageService.addFile(file);
+
+        return Response.created(
+                UriBuilder.fromUri(uriInfo.getRequestUri())
+                        .path(id.toString())
+                        .build())
+                .build();
     }
 
+    @POST
+    @Path("upload/{id}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response uploadFile(@Context UriInfo uriInfo,
+                               @PathParam("id") Integer folderId,
+                               @FormDataParam("file") InputStream fileInputStream,
+                               @FormDataParam("file") FormDataContentDisposition fileDisposition,
+                               @FormDataParam("name") String name) {
+        final SingleFile file = storageService.readFile(fileInputStream, fileDisposition, name);
+        Integer id;
+        id = storageService.addFile(file, folderId);
+
+        return Response.created(
+                UriBuilder.fromUri(uriInfo.getRequestUri())
+                        .path(id.toString())
+                        .build())
+                .build();
+    }
     @GET
     @Produces({MediaType.APPLICATION_OCTET_STREAM})
     @Path("download/{id}/{user}")
@@ -105,9 +102,9 @@ public class FileResource {
     }
 
     @GET
-      @Path("info/{user}")
-      @Produces({"application/xml", "application/json"})
-      public Response getFiles(@PathParam("user") String user, @Context Request request,  @MatrixParam("fileName") String fileName) {
+    @Path("info/{user}")
+    @Produces({"application/xml", "application/json"})
+    public Response getFiles(@PathParam("user") String user, @Context Request request, @MatrixParam("fileName") String fileName) {
         final Response.ResponseBuilder rb = Response.ok();
 
         if (StringUtils.isEmpty(fileName)) {
@@ -128,14 +125,14 @@ public class FileResource {
     @GET
     @Path("folder/{id}/{user}")
     @Produces({"application/xml", "application/json"})
-    public Response getFileFromFolder(@PathParam("id") Integer id,@PathParam("user") String user) {
+    public Response getFileFromFolder(@PathParam("id") Integer id, @PathParam("user") String user) {
         Collection<SingleFile> files = storageService.getFilesFromFolder(id, user);
-        if(files ==null){
+        if (files == null) {
             throw new FolderNotFoundException(id);
         }
         final Response.ResponseBuilder rb = Response.ok();
-            rb.entity(new GenericEntity<Collection<SingleFile>>(files) {
-            });
+        rb.entity(new GenericEntity<Collection<SingleFile>>(files) {
+        });
         return rb.build();
     }
 
@@ -154,6 +151,7 @@ public class FileResource {
     private String computeTag(SingleFile file) {
         return file.hashCode() + "";
     }
+
     private String computeTag(Collection<SingleFile> files) {
         return files.hashCode() + "";
     }

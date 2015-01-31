@@ -35,8 +35,9 @@ public class InMemoryStorage implements StorageInterface {
 
         long freeSpace =getFreeScape(singleFile.getOwner());
         if(freeSpace<singleFile.getSize()){
-            return null;
+            throw new NoFreeSpaceException();
         }
+
         Integer id = idCounterFile.incrementAndGet();
         singleFile.setId(id);
         files.putIfAbsent(id, singleFile);
@@ -47,8 +48,12 @@ public class InMemoryStorage implements StorageInterface {
     public Integer addFile(SingleFile singleFile, int folderId) {
         long freeSpace =getFreeScape(singleFile.getOwner());
         if(freeSpace<singleFile.getSize()){
-            return null;
+            throw new NoFreeSpaceException();
         }
+        if(!checkIfFolderExists(folderId, singleFile.getOwner())){
+            throw new FolderNotFoundException(folderId);
+        }
+
         Integer id = idCounterFile.incrementAndGet();
         singleFile.setId(id);
         singleFile.setFolderId(folderId);
@@ -79,8 +84,8 @@ public class InMemoryStorage implements StorageInterface {
 
     @Override
     public Collection<SingleFile> getAllFilesFromFolder(int folderId,  String user) {
-        if (!folders.containsKey(folderId)) {
-           return null;
+        if(!checkIfFolderExists(folderId, user)){
+            return null;
         }
         if (files.isEmpty()) {
             return Collections.emptySet();
@@ -172,5 +177,19 @@ public class InMemoryStorage implements StorageInterface {
             }
         }
         return SPACE_LIMIT - used;
+    }
+
+    @Override
+    public Boolean checkIfFolderExists(int folderId, String user) {
+        if (!folders.containsKey(folderId)) {
+            return false;
+        }else{
+            String owner = folders.get(folderId).getOwner();
+            if (!owner.equals(user) ) {
+                return false;
+            }else{
+                return true;
+            }
+        }
     }
 }
