@@ -177,4 +177,8 @@ public class StorageService {
         }
 
     }
+    ///Storage
+    public long getFreeSpace(String user){
+       return storage.getFreeScape(user);
+    }
 }

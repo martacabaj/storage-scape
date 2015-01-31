@@ -7,6 +7,7 @@ import project.core.StorageInterface;
 import project.core.StorageService;
 import project.resources.FileResource;
 import project.resources.FolderResource;
+import project.resources.StorageResources;
 
 /**
  * Created by Marta on 2015-01-03.
@@ -22,7 +23,7 @@ public class ApplicationResourceConfig extends ResourceConfig {
         register(new FileResource(storageService));
         register(new FolderResource(storageService));
 
-
+        register(new StorageResources(storageService));
         // setting a package that contains the REST resource classes
         packages("project.resources");
 
