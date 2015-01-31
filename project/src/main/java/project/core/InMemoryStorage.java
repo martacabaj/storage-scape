@@ -127,7 +127,7 @@ public class InMemoryStorage implements StorageInterface {
 
     @Override
     public void deleteFolder(Integer folderId, String user) {
-        String owner = files.get(folderId).getOwner();
+        String owner = folders.get(folderId).getOwner();
         if (owner.equals(user)){
             folders.remove(folderId);
         }
