@@ -43,5 +43,12 @@ public class StorageService {
             throw e;
         }
     }
+    public void deleteFolder(Integer id, String user){
+        try{
+            storage.deleteFolder(id, user);
+        }catch(IllegalArgumentException e){
+            throw e;
+        }
+    }
 
 }

@@ -40,4 +40,17 @@ public class FolderResource {
         }
         return javax.ws.rs.core.Response.ok(id).build();
     }
+
+    @DELETE
+    @Path("{id}/{user}")
+    public Response deleteFolder(@PathParam("id") Integer id, @PathParam("user") String user) {
+        try {
+            storageService.deleteFolder(id, user);
+        } catch (Exception e) {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .build());
+        }
+        return Response.ok().build();
+    }
 }
