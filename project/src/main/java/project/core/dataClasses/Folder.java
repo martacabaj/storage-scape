@@ -1,4 +1,4 @@
-package project.core;
+package project.core.dataClasses;
 
 import javax.xml.bind.annotation.*;
 import java.util.Set;

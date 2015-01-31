@@ -1,7 +1,10 @@
 package project.core;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader;
 import edu.emory.mathcs.backport.java.util.Collections;
+import project.core.dataClasses.Folder;
+import project.core.dataClasses.SingleFile;
+import project.core.exceptions.FolderNotFoundException;
+import project.core.exceptions.NoFreeSpaceException;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -142,7 +145,7 @@ public class InMemoryStorage implements StorageInterface {
 
         for (SingleFile file : files.values()) {
             if (file.getFolderId() == folderId && file.getOwner() == user) {
-                files.remove(file.id);
+                files.remove(file.getId());
             }
         }
     }

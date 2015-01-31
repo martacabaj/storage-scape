@@ -1,16 +1,12 @@
 package project.resources;
 
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import project.core.Folder;
+import project.core.dataClasses.Folder;
 import project.core.StorageService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Created by Marta on 2015-01-03.

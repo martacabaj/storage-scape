@@ -5,6 +5,9 @@ import jersey.repackaged.com.google.common.base.Predicates;
 import jersey.repackaged.com.google.common.collect.Collections2;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import project.core.dataClasses.Folder;
+import project.core.dataClasses.SingleFile;
+import project.core.exceptions.NoFreeSpaceException;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

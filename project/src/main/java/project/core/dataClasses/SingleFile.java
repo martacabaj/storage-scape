@@ -1,4 +1,4 @@
-package project.core;
+package project.core.dataClasses;
 
 import javax.xml.bind.annotation.*;
 import java.util.HashSet;
@@ -36,6 +36,9 @@ public class SingleFile {
         this.folderId = folderId;
         this.size = fileBytesArray.length;
         this.owner = owner;
+    }
+    public void updateFileInfo(SingleFile singleFile){
+
     }
 
     public byte[] getFileBytesArray() {
@@ -93,11 +96,6 @@ public class SingleFile {
     @XmlElementWrapper(name="shared-users")
     @XmlElement
     public Set<String> getSharedUsers() {
-
-        sharedUsers.add("dfff");
-        sharedUsers.add("dfff2");
-        sharedUsers.add("dfff3");
-        sharedUsers.add("dfff4");
         return sharedUsers;
     }
 

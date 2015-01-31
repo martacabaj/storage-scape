@@ -1,6 +1,7 @@
 package project.core;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader;
+import project.core.dataClasses.Folder;
+import project.core.dataClasses.SingleFile;
 
 import java.util.Collection;
 
@@ -21,5 +22,6 @@ public interface StorageInterface {
     void updateFolder(Folder folder, String user);
     long getFreeScape(String user);
     Boolean checkIfFolderExists(int folderId, String user);
+
 
 }

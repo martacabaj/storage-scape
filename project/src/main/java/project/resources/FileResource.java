@@ -3,9 +3,9 @@ package project.resources;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import project.core.FileNotFoundException;
-import project.core.FolderNotFoundException;
-import project.core.SingleFile;
+import project.core.exceptions.FileNotFoundException;
+import project.core.exceptions.FolderNotFoundException;
+import project.core.dataClasses.SingleFile;
 import project.core.StorageService;
 
 import javax.ws.rs.*;
