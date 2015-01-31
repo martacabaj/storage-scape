@@ -13,6 +13,9 @@ import javax.ws.rs.core.*;
 import java.io.InputStream;
 import java.util.Collection;
 
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
+
 /**
  * Created by Marta on 2015-01-02.
  */
@@ -143,11 +146,14 @@ public class FileResource {
 
     @DELETE
     @Path("{id}/{user}")
-    public Response deleteFile(@PathParam("id") Integer id, @PathParam("user") String user) {
-        try {
-            storageService.deleteFile(id, user);
-        } catch (Exception e) {
-            throw new FileNotFoundException(id);
+    public Response deleteFile(@PathParam("id") Integer id, @PathParam("user") String user, @Context SecurityContext context) {
+        String username = context.getUserPrincipal().getName();
+        if(username==user) {
+            try {
+                storageService.deleteFile(id, user);
+            } catch (Exception e) {
+                throw new FileNotFoundException(id);
+            }
         }
         return Response.ok().build();
     }

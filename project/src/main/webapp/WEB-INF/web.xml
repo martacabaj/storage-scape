@@ -28,4 +28,24 @@
         <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/webapi/*</url-pattern>
     </servlet-mapping>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Secure</web-resource-name>
+            <url-pattern>/webapi/file/*</url-pattern>
+            <http-method>DELETE</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>has to be a USER</description>
+            <role-name>USERS</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>my_realm</realm-name>
+    </login-config>
+    <security-role>
+        <role-name>USERS</role-name>
+    </security-role>
 </web-app>
