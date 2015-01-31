@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import project.core.FileNotFoundException;
+import project.core.FolderNotFoundException;
 import project.core.SingleFile;
 import project.core.StorageService;
 
@@ -85,7 +86,7 @@ public class FileResource {
     @GET
     @Path("info/{id}/{user}")
     @Produces({"application/xml", "application/json"})
-    public Response getFileInfo(@PathParam("id") int id, @PathParam("user") String user, @Context Request request) {
+    public Response getFile(@PathParam("id") int id, @PathParam("user") String user, @Context Request request) {
         final SingleFile file = storageService.getFile(id, user);
         if (file == null) {
             throw new FileNotFoundException(id);
@@ -104,9 +105,9 @@ public class FileResource {
     }
 
     @GET
-    @Path("info/{user}")
-    @Produces({"application/xml", "application/json"})
-    public Response getFilesInfo(@PathParam("user") String user, @Context Request request,  @MatrixParam("fileName") String fileName) {
+      @Path("info/{user}")
+      @Produces({"application/xml", "application/json"})
+      public Response getFiles(@PathParam("user") String user, @Context Request request,  @MatrixParam("fileName") String fileName) {
         final Response.ResponseBuilder rb = Response.ok();
 
         if (StringUtils.isEmpty(fileName)) {
@@ -124,6 +125,20 @@ public class FileResource {
         return rb.build();
     }
 
+    @GET
+    @Path("folder/{id}/{user}")
+    @Produces({"application/xml", "application/json"})
+    public Response getFileFromFolder(@PathParam("id") Integer id,@PathParam("user") String user) {
+        Collection<SingleFile> files = storageService.getFilesFromFolder(id, user);
+        if(files ==null){
+            throw new FolderNotFoundException(id);
+        }
+        final Response.ResponseBuilder rb = Response.ok();
+            rb.entity(new GenericEntity<Collection<SingleFile>>(files) {
+            });
+        return rb.build();
+    }
+
 
     @DELETE
     @Path("{id}/{user}")
@@ -138,6 +153,9 @@ public class FileResource {
 
     private String computeTag(SingleFile file) {
         return file.hashCode() + "";
+    }
+    private String computeTag(Collection<SingleFile> files) {
+        return files.hashCode() + "";
     }
 }
 

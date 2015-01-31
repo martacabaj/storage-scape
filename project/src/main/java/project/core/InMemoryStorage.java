@@ -80,7 +80,7 @@ public class InMemoryStorage implements StorageInterface {
     @Override
     public Collection<SingleFile> getAllFilesFromFolder(int folderId,  String user) {
         if (!folders.containsKey(folderId)) {
-            throw new IllegalArgumentException("Folder does not exist");
+           return null;
         }
         if (files.isEmpty()) {
             return Collections.emptySet();

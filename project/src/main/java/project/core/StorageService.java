@@ -58,6 +58,11 @@ public class StorageService {
 
         return files;
     }
+    public  Collection<SingleFile>  getFilesFromFolder(Integer id, String user){
+        Collection<SingleFile> files = storage.getAllFilesFromFolder(id, user);
+
+        return files;
+    }
     public Integer addFolder (Folder folder){
         if(null!= folder.getId()){
             throw new IllegalArgumentException("Cannot add file with ID already defined");
