@@ -1,12 +1,14 @@
 package project.core;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.*;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by Marta on 2015-01-01.
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public class SingleFile {
     String name;
     long size;
@@ -20,7 +22,7 @@ public class SingleFile {
     }
 
     public SingleFile(String name, byte[] fileBytesArray, String owner) {
-
+        sharedUsers = new HashSet<>();
         this.name = name;
         this.size = fileBytesArray.length;
         this.fileBytesArray = fileBytesArray;
@@ -28,11 +30,20 @@ public class SingleFile {
     }
 
     public SingleFile(String name, byte[] fileBytesArray, int folderId, String owner) {
+        sharedUsers = new HashSet<>();
         this.name = name;
         this.fileBytesArray = fileBytesArray;
         this.folderId = folderId;
         this.size = fileBytesArray.length;
         this.owner = owner;
+    }
+
+    public byte[] getFileBytesArray() {
+        return fileBytesArray;
+    }
+
+    public void setFileBytesArray(byte[] fileBytesArray) {
+        this.fileBytesArray = fileBytesArray;
     }
 
     @XmlElement
@@ -53,14 +64,6 @@ public class SingleFile {
         this.size = size;
     }
 
-    public byte[] getFileBytesArray() {
-        return fileBytesArray;
-    }
-
-    public void setFileBytesArray(byte[] fileBytesArray) {
-        this.fileBytesArray = fileBytesArray;
-    }
-
     @XmlAttribute
     public Integer getId() {
         return id;
@@ -78,7 +81,7 @@ public class SingleFile {
     public void setFolderId(int folderId) {
         this.folderId = folderId;
     }
-
+    @XmlElement
     public String getOwner() {
         return owner;
     }
@@ -87,7 +90,14 @@ public class SingleFile {
         this.owner = owner;
     }
 
+    @XmlElementWrapper(name="shared-users")
+    @XmlElement
     public Set<String> getSharedUsers() {
+
+        sharedUsers.add("dfff");
+        sharedUsers.add("dfff2");
+        sharedUsers.add("dfff3");
+        sharedUsers.add("dfff4");
         return sharedUsers;
     }
 

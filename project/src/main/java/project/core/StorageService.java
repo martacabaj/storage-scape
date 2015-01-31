@@ -12,6 +12,9 @@ public class StorageService {
     }
 
     public Integer addFile(SingleFile singleFile) {
+        if(null!= singleFile.getId()){
+            throw new IllegalArgumentException("Cannot add file with ID already defined");
+        }
         Integer id =storage.addFile(singleFile);
         if(null == id){
             throw new IllegalArgumentException("No free sapce to add file");
@@ -27,7 +30,11 @@ public class StorageService {
         return file;
     }
     public Integer addFolder (Folder folder){
-        return storage.addFolder(folder);
+        if(null!= folder.getId()){
+            throw new IllegalArgumentException("Cannot add file with ID already defined");
+        }
+        Integer id =storage.addFolder(folder);
+        return id ;
     }
     public void deleteFile(Integer id, String user){
         try{

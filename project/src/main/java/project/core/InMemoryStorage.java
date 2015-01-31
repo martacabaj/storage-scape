@@ -32,6 +32,7 @@ public class InMemoryStorage implements StorageInterface {
 
     @Override
     public Integer addFile(SingleFile singleFile) {
+
         long freeSpace =getFreeScape(singleFile.getOwner());
         if(freeSpace<singleFile.getSize()){
             return null;
