@@ -119,17 +119,17 @@ public class FileResource {
     @GET
     @Path("info")
     @Produces({"application/xml", "application/json"})
-    public Response getFiles(@Context SecurityContext sc, @Context Request request, @MatrixParam("fileName") String fileName) {
+    public Response getFiles(@Context SecurityContext sc, @Context Request request, @MatrixParam("name") String name) {
         final Response.ResponseBuilder rb = Response.ok();
         String user = sc.getUserPrincipal().getName();
-        if (StringUtils.isEmpty(fileName)) {
+        if (StringUtils.isEmpty(name)) {
             rb.entity(new GenericEntity<Collection<SingleFile>>(storageService.getFiles(user)) {
             });
 
         } else {
             rb.entity(
                     new GenericEntity<Collection<SingleFile>>(
-                            storageService.getFilesFilteredBy(user, fileName)) {
+                            storageService.getFilesFilteredBy(user, name)) {
                     });
         }
 
@@ -140,7 +140,7 @@ public class FileResource {
     @GET
     @Path("folder/{id}")
     @Produces({"application/xml", "application/json"})
-    public Response getFileFromFolder(@PathParam("id") Integer id,@Context SecurityContext sc) {
+    public Response getFileFromFolder(@PathParam("id") Integer id, @Context SecurityContext sc) {
         String user = sc.getUserPrincipal().getName();
         Collection<SingleFile> files = storageService.getFilesFromFolder(id, user);
         if (files == null) {
@@ -149,9 +149,6 @@ public class FileResource {
         final Response.ResponseBuilder rb = Response.ok();
         rb.entity(new GenericEntity<Collection<SingleFile>>(files) {
         });
-
-
-
         return rb.build();
     }
 
@@ -166,18 +163,20 @@ public class FileResource {
         }
         return Response.ok().build();
     }
+
     @PUT
     @Path("/share/{id}")
     @Consumes({"application/xml", "application/json"})
-    public Response shareFile(@PathParam("id")Integer fileId, @Context SecurityContext sc, Set<User> sharedUsers, @Context UriInfo uriInfo,
-                              @Context Request request){
+    public Response shareFile(@PathParam("id") Integer fileId, @Context SecurityContext sc, Set<User> sharedUsers, @Context UriInfo uriInfo,
+                              @Context Request request) {
         storageService.shareFile(fileId, sc.getUserPrincipal().getName(), sharedUsers);
-                              return Response.created(
-            UriBuilder.fromUri(uriInfo.getRequestUri())
-            .path(fileId.toString())
-            .build())
-            .build();
+        return Response.created(
+                UriBuilder.fromUri(uriInfo.getRequestUri())
+                        .path(fileId.toString())
+                        .build())
+                .build();
     }
+
     private String computeTag(SingleFile file) {
         return file.hashCode() + "";
     }

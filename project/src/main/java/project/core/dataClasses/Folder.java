@@ -31,7 +31,7 @@ public class Folder {
         this.name = name;
     }
 
-    @XmlAttribute
+    @XmlElement
     public Integer getId() {
         return id;
     }

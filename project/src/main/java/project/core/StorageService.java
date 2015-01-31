@@ -9,7 +9,9 @@ import project.core.dataClasses.Folder;
 import project.core.dataClasses.SingleFile;
 import project.core.dataClasses.User;
 import project.core.exceptions.FileNotFoundException;
+import project.core.exceptions.FolderNotFoundException;
 import project.core.exceptions.NoFreeSpaceException;
+import project.core.exceptions.PostWithIdException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,6 +30,7 @@ public class StorageService {
         this.storage = storage;
     }
 
+    ///FILES
     public SingleFile readFile(InputStream fileInputStream,
                                FormDataContentDisposition fileDisposition,
                                String name) {
@@ -51,7 +54,7 @@ public class StorageService {
 
     public Integer addFile(SingleFile singleFile) {
         if (null != singleFile.getId()) {
-            throw new IllegalArgumentException("Cannot add file with ID already defined");
+            throw new PostWithIdException();
         }
         try {
             Integer id = storage.addFile(singleFile);
@@ -66,7 +69,7 @@ public class StorageService {
 
     public Integer addFile(SingleFile singleFile, Integer folderId) {
         if (null != singleFile.getId()) {
-            throw new IllegalArgumentException("Cannot add file with ID already defined");
+            throw new PostWithIdException();
         }
         try {
             Integer id = storage.addFile(singleFile, folderId);
@@ -110,13 +113,6 @@ public class StorageService {
         return files;
     }
 
-    public Integer addFolder(Folder folder) {
-        if (null != folder.getId()) {
-            throw new IllegalArgumentException("Cannot add file with ID already defined");
-        }
-        Integer id = storage.addFolder(folder);
-        return id;
-    }
 
     public void deleteFile(Integer id, String user) {
         try {
@@ -126,13 +122,6 @@ public class StorageService {
         }
     }
 
-    public void deleteFolder(Integer id, String user) {
-        try {
-            storage.deleteFolder(id, user);
-        } catch (IllegalArgumentException e) {
-            throw e;
-        }
-    }
 
     public void shareFile(Integer fileId, String owner, Set<User> users) {
         try {
@@ -142,5 +131,50 @@ public class StorageService {
         }
     }
 
+    ///FOLDERS
+    public Integer addFolder(Folder folder, String user) {
+        if (null != folder.getId()) {
+            throw new PostWithIdException();
+        }
+        folder.setOwner(user);
+        Integer id = storage.addFolder(folder);
+        return id;
+    }
 
+    public Folder getFolder(Integer folderId, String user) {
+        Folder folder = storage.getOneFolder(folderId, user);
+        if (folder == null) {
+            throw new FolderNotFoundException(folderId);
+        }
+        return folder;
+    }
+
+    public Collection<Folder> getFolders(String user) {
+
+        return storage.getAllFolders(user);
+    }
+
+    public Collection<Folder> getFoldersFilteredBy(final String user,
+                                                   final String name) {
+        Predicate<Folder> namePredicate = new Predicate<Folder>() {
+            @Override
+            public boolean apply(Folder folder) {
+                return StringUtils.isEmpty(folder.getName()) || folder.getName().toLowerCase().contains(name.toLowerCase());
+            }
+        };
+
+
+        return Collections2.filter(storage.getAllFolders(user),
+                Predicates.and(namePredicate));
+    }
+
+    public void deleteFolder(Integer id, String user) {
+        try {
+            storage.deleteFolder(id, user);
+
+        } catch (FolderNotFoundException e) {
+            throw e;
+        }
+
+    }
 }
