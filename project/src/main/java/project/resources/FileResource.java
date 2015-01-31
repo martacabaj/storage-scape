@@ -25,13 +25,14 @@ public class FileResource {
 
 
     @POST
-    @Path("upload")
+    @Path("uploadToFolder")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response uploadFile(
+    public Response uploadFileToFolder(
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @FormDataParam("name") String name) {
+            @FormDataParam("owner") String owner,
+            @FormDataParam("folder") Integer folder) {
         if (fileInputStream == null) {
             throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
                     .entity("No file")
@@ -50,7 +51,46 @@ public class FileResource {
             e.printStackTrace();
         }
 
-        final SingleFile file = new SingleFile(fileName, buffer.toByteArray(), name);
+        final SingleFile file = new SingleFile(fileName, buffer.toByteArray(), folder, owner);
+
+        Integer id;
+        try {
+            id = storageService.addFileToFolder(file,folder);
+        } catch (IllegalArgumentException e) {
+            throw new WebApplicationException(Response.status(Response.Status.REQUEST_ENTITY_TOO_LARGE)
+                    .entity(e.getMessage())
+                    .build());
+        }
+        return Response.ok(id).build();
+    }
+
+    @POST
+    @Path("upload")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response uploadFile(
+            @FormDataParam("file") InputStream fileInputStream,
+            @FormDataParam("file") FormDataContentDisposition fileDisposition,
+            @FormDataParam("owner") String owner) {
+        if (fileInputStream == null) {
+            throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
+                    .entity("No file")
+                    .build());
+        }
+        String fileName = fileDisposition.getFileName();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int read = 0;
+        final byte[] bytes = new byte[1024];
+        try {
+            while ((read = fileInputStream.read(bytes)) != -1) {
+                buffer.write(bytes, 0, read);
+            }
+            fileInputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        final SingleFile file = new SingleFile(fileName, buffer.toByteArray(), owner);
 
         Integer id;
         try {

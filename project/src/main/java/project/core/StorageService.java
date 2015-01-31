@@ -51,4 +51,14 @@ public class StorageService {
         }
     }
 
+    public Integer addFileToFolder(SingleFile singleFile, Integer folderId) {
+        if(null!= singleFile.getId()){
+            throw new IllegalArgumentException("Cannot add file with ID already defined");
+        }
+        Integer id =storage.addFile(singleFile,folderId);
+        if(null == id){
+            throw new IllegalArgumentException("No free sapce to add file");
+        }
+        return id ;
+    }
 }

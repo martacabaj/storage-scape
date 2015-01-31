@@ -30,6 +30,8 @@ public class InMemoryStorage implements StorageInterface {
 
     }
 
+
+
     @Override
     public Integer addFile(SingleFile singleFile) {
 
@@ -52,7 +54,11 @@ public class InMemoryStorage implements StorageInterface {
         Integer id = idCounterFile.incrementAndGet();
         singleFile.setId(id);
         singleFile.setFolderId(folderId);
-        files.putIfAbsent(id, singleFile);
+        if(folders.containsKey(folderId)) {
+            files.putIfAbsent(id, singleFile);
+        }else{
+            throw new IllegalArgumentException("There is no such folder");
+        }
         return id;
     }
 
