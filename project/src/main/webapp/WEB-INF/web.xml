@@ -28,7 +28,7 @@
     <security-constraint>
         <display-name>Authentication Constraint</display-name>
         <web-resource-collection>
-            <web-resource-name>CarRental REST service</web-resource-name>
+            <web-resource-name>Storage REST service</web-resource-name>
             <url-pattern>/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
