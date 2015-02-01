@@ -1,26 +1,18 @@
 import client.WebTargetBuilder;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import project.core.dataClasses.Folder;
-import project.core.dataClasses.SingleFile;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 /**
- * Created by Marta on 2015-02-01.
+ * Created by Maciek on 2015-02-01.
  */
 public class FolderResourceTest {
 
@@ -28,26 +20,16 @@ public class FolderResourceTest {
     };
 
     private static final Folder FOLDER_TO_POST = new Folder("folder");
-    public static final Entity<String> TEXT_ENTITY = Entity.entity("Any", MediaType.TEXT_PLAIN);
+    public static final Entity<String> TEXT_ENTITY = Entity.entity("Text", MediaType.TEXT_PLAIN);
 
     private WebTarget folders;
 
-    private static final SingleFile FILE_TO_POST = new SingleFile();
-    private WebTarget files;
-
     @Before
     public void setUp() {
-        files = WebTargetBuilder.newUserAuthorizedTarget().getFile();
         folders = WebTargetBuilder.newUserAuthorizedTarget().getFolder();
         folders.request("application/xml").post(Entity.entity(FOLDER_TO_POST, "application/xml"));
     }
-/*
-    @Test
-    public void postFile() {
-        final Response response = files.request(MediaType.MULTIPART_FORM_DATA_TYPE).post(Entity.entity(FILE_TO_POST, MediaType.MULTIPART_FORM_DATA_TYPE));
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    }
-*/
+
     @Test
     public void postShouldReturn201() {
         final Response response = folders.request("application/xml").post(Entity.entity(FOLDER_TO_POST, "application/xml"));
