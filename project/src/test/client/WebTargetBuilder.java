@@ -1,6 +1,7 @@
 package client;
 
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -22,6 +23,7 @@ public class WebTargetBuilder {
     private WebTarget webTarget;
 
     private WebTargetBuilder(Client client) {
+        client.register(MultiPartFeature.class);
         this.webTarget = client.target(ClientUtils.HOST_URL);
     }
 
@@ -46,6 +48,14 @@ public class WebTargetBuilder {
 
     public WebTarget getFolder() {
         return webTarget.path(ClientUtils.FOLDER_PATH);
+    }
+
+    public WebTarget getFolderParam() {
+        return webTarget.path(ClientUtils.FOLDER_PARAM_PATH);
+    }
+
+    public WebTarget getFile() {
+        return webTarget.path(ClientUtils.FILE_PATH);
     }
 
     public WebTarget getFreeStorage() {
