@@ -13,7 +13,7 @@ public class SingleFile {
     String name;
     long size;
     byte[] fileBytesArray;
-    int folderId;
+    Integer folderId;
     Integer id;
     String owner;
     Set<String> sharedUsers;
@@ -67,7 +67,7 @@ public class SingleFile {
         this.size = size;
     }
 
-    @XmlAttribute
+    @XmlElement
     public Integer getId() {
         return id;
     }
@@ -77,11 +77,11 @@ public class SingleFile {
     }
 
     @XmlElement
-    public int getFolderId() {
+    public Integer getFolderId() {
         return folderId;
     }
 
-    public void setFolderId(int folderId) {
+    public void setFolderId(Integer folderId) {
         this.folderId = folderId;
     }
     @XmlElement
@@ -96,6 +96,10 @@ public class SingleFile {
     @XmlElementWrapper(name="shared-users")
     @XmlElement
     public Set<String> getSharedUsers() {
+
+        if(sharedUsers==null){
+            sharedUsers = new HashSet<>();
+        }
         return sharedUsers;
     }
 

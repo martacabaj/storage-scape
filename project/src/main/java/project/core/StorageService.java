@@ -131,6 +131,14 @@ public class StorageService {
         }
     }
 
+    public void moveFile(SingleFile file, String user) {
+        try {
+            storage.moveFile(file, user);
+        } catch (FileNotFoundException e) {
+            throw e;
+        }
+    }
+
     ///FOLDERS
     public Integer addFolder(Folder folder, String user) {
         if (null != folder.getId()) {
@@ -177,8 +185,9 @@ public class StorageService {
         }
 
     }
+
     ///Storage
-    public long getFreeSpace(String user){
-       return storage.getFreeScape(user);
+    public long getFreeSpace(String user) {
+        return storage.getFreeScape(user);
     }
 }

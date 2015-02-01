@@ -82,7 +82,7 @@ public class InMemoryStorage implements StorageInterface {
         Set<SingleFile> filesToReturn = new HashSet<SingleFile>();
         for (SingleFile file : files.values()) {
             String owner = file.getOwner();
-            if (owner.equals(user) || (file.getSharedUsers()!=null&&file.getSharedUsers().contains(user))) {
+            if (owner.equals(user) || (file.getSharedUsers() != null && file.getSharedUsers().contains(user))) {
                 filesToReturn.add(file);
             }
         }
@@ -100,9 +100,10 @@ public class InMemoryStorage implements StorageInterface {
         Set<SingleFile> filesFromFolder = new HashSet<>();
         for (SingleFile file : files.values()) {
             String owner = file.getOwner();
-
-            if (file.getFolderId() == folderId && owner.equals(user)||(file.getFolderId() == folderId&&file.getSharedUsers()!=null&&file.getSharedUsers().contains(user))) {
-                filesFromFolder.add(file);
+            if (file.getFolderId() != null) {
+                if (file.getFolderId() == folderId && owner.equals(user) || (file.getFolderId() == folderId && file.getSharedUsers() != null && file.getSharedUsers().contains(user))) {
+                    filesFromFolder.add(file);
+                }
             }
         }
         return filesFromFolder;
@@ -127,7 +128,7 @@ public class InMemoryStorage implements StorageInterface {
         if (files.containsKey(id)) {
             SingleFile file = files.get(id);
             String owner = file.getOwner();
-            if(owner.equals(user)|| (file.getSharedUsers()!=null&&file.getSharedUsers().contains(user)))
+            if (owner.equals(user) || (file.getSharedUsers() != null && file.getSharedUsers().contains(user)))
                 return file;
         }
         return null;
@@ -220,6 +221,17 @@ public class InMemoryStorage implements StorageInterface {
             } else {
                 throw new FileNotFoundException(fileId);
             }
+        }
+    }
+
+    @Override
+    public void moveFile(SingleFile file, String user) {
+        if (!files.containsKey(file.getId()) || !files.get(file.getId()).getOwner().equals(user)) {
+            throw new FileNotFoundException(file.getId());
+        } else {
+            SingleFile fileToUpdate = files.get(file.getId());
+            fileToUpdate.setFolderId(file.getFolderId());
+
         }
     }
 
