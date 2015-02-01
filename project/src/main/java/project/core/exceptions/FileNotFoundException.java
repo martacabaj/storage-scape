@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response;
 public class FileNotFoundException extends WebApplicationException {
     public FileNotFoundException(Integer fileId){
         super(Response.status(Response.Status.NOT_FOUND)
-        .entity("The file with id "+fileId+" does not exists")
+        .entity("The file with id "+fileId+" does not exist")
         .build());
     }
 }

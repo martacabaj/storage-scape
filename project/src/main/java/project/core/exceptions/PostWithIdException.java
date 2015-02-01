@@ -6,10 +6,10 @@ import javax.ws.rs.core.Response;
 /**
  * Created by Marta on 2015-01-31.
  */
-public class FolderNotFoundException extends WebApplicationException {
-    public FolderNotFoundException(Integer folderId){
+public class PostWithIdException  extends WebApplicationException {
+    public PostWithIdException() {
         super(Response.status(Response.Status.NOT_FOUND)
-                .entity("The folder with id "+folderId+" does not exist")
+                .entity("Cannot post object with predefined id")
                 .build());
     }
 }

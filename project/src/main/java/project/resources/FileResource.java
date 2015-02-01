@@ -10,22 +10,15 @@ import project.core.exceptions.FileNotFoundException;
 import project.core.exceptions.FolderNotFoundException;
 
 import javax.ws.rs.*;
-<<<<<<< HEAD
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.*;
-import javax.ws.rs.DELETE;
-=======
 import javax.ws.rs.core.*;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Set;
 
->>>>>>> ab3768ea87edc8c4b5f0fdabb6b741629cd5910c
 /**
  * Created by Marta on 2015-01-02.
  */
-@Path("/file")
+@Path("file")
 public class FileResource {
     private final StorageService storageService;
 
@@ -35,42 +28,8 @@ public class FileResource {
 
 
     @POST
-    @Path("/upload")
+    @Path("upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-<<<<<<< HEAD
-    public Response uploadFile(
-            @FormDataParam("file") InputStream uploadedInputStream,
-            @FormDataParam("file") FormDataContentDisposition fileDetail) {
-
-        String uploadedFileLocation = "C://" + fileDetail.getFileName();
-
-        writeToFile(uploadedInputStream, uploadedFileLocation);
-
-        String output = "File uploaded to : " + uploadedFileLocation;
-
-        return Response.status(200).entity(output).build();
-
-    }
-
-    private void writeToFile(InputStream uploadedInputStream,
-                             String uploadedFileLocation) {
-
-        try {
-            OutputStream out = new FileOutputStream(new File(
-                    uploadedFileLocation));
-            int read = 0;
-            byte[] bytes = new byte[1024];
-
-            out = new FileOutputStream(new File(uploadedFileLocation));
-            while ((read = uploadedInputStream.read(bytes)) != -1) {
-                out.write(bytes, 0, read);
-            }
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-
-            e.printStackTrace();
-=======
     @Produces(MediaType.TEXT_PLAIN)
     public Response uploadFile(@Context UriInfo uriInfo,
                                @FormDataParam("file") InputStream fileInputStream,
@@ -80,7 +39,6 @@ public class FileResource {
             throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
                     .entity("No file")
                     .build());
->>>>>>> ab3768ea87edc8c4b5f0fdabb6b741629cd5910c
         }
         final SingleFile file = storageService.readFile(fileInputStream, fileDisposition, sc.getUserPrincipal().getName());
         Integer id;
@@ -94,13 +52,11 @@ public class FileResource {
     }
 
 
-<<<<<<< HEAD
-=======
     @POST
-    @Path("upload/id")
+    @Path("upload/{id}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response uploadFile(@Context UriInfo uriInfo,
+    public Response uploadFileToFolder(@Context UriInfo uriInfo,
                                @PathParam("id") Integer folderId,
                                @FormDataParam("file") InputStream fileInputStream,
                                @FormDataParam("file") FormDataContentDisposition fileDisposition,
@@ -119,7 +75,6 @@ public class FileResource {
                         .path(id.toString())
                         .build())
                 .build();
->>>>>>> ab3768ea87edc8c4b5f0fdabb6b741629cd5910c
     }
 
     @GET
@@ -164,17 +119,17 @@ public class FileResource {
     @GET
     @Path("info")
     @Produces({"application/xml", "application/json"})
-    public Response getFiles(@Context SecurityContext sc, @Context Request request, @MatrixParam("fileName") String fileName) {
+    public Response getFiles(@Context SecurityContext sc, @Context Request request, @MatrixParam("name") String name) {
         final Response.ResponseBuilder rb = Response.ok();
         String user = sc.getUserPrincipal().getName();
-        if (StringUtils.isEmpty(fileName)) {
+        if (StringUtils.isEmpty(name)) {
             rb.entity(new GenericEntity<Collection<SingleFile>>(storageService.getFiles(user)) {
             });
 
         } else {
             rb.entity(
                     new GenericEntity<Collection<SingleFile>>(
-                            storageService.getFilesFilteredBy(user, fileName)) {
+                            storageService.getFilesFilteredBy(user, name)) {
                     });
         }
 
@@ -185,7 +140,7 @@ public class FileResource {
     @GET
     @Path("folder/{id}")
     @Produces({"application/xml", "application/json"})
-    public Response getFileFromFolder(@PathParam("id") Integer id,@Context SecurityContext sc) {
+    public Response getFileFromFolder(@PathParam("id") Integer id, @Context SecurityContext sc) {
         String user = sc.getUserPrincipal().getName();
         Collection<SingleFile> files = storageService.getFilesFromFolder(id, user);
         if (files == null) {
@@ -194,9 +149,6 @@ public class FileResource {
         final Response.ResponseBuilder rb = Response.ok();
         rb.entity(new GenericEntity<Collection<SingleFile>>(files) {
         });
-
-
-
         return rb.build();
     }
 
@@ -211,18 +163,20 @@ public class FileResource {
         }
         return Response.ok().build();
     }
+
     @PUT
     @Path("/share/{id}")
     @Consumes({"application/xml", "application/json"})
-    public Response shareFile(@PathParam("id")Integer fileId, @Context SecurityContext sc, Set<User> sharedUsers, @Context UriInfo uriInfo,
-                              @Context Request request){
+    public Response shareFile(@PathParam("id") Integer fileId, @Context SecurityContext sc, Set<User> sharedUsers, @Context UriInfo uriInfo,
+                              @Context Request request) {
         storageService.shareFile(fileId, sc.getUserPrincipal().getName(), sharedUsers);
-                              return Response.created(
-            UriBuilder.fromUri(uriInfo.getRequestUri())
-            .path(fileId.toString())
-            .build())
-            .build();
+        return Response.created(
+                UriBuilder.fromUri(uriInfo.getRequestUri())
+                        .path(fileId.toString())
+                        .build())
+                .build();
     }
+
     private String computeTag(SingleFile file) {
         return file.hashCode() + "";
     }

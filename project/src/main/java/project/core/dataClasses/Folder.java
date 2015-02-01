@@ -18,6 +18,10 @@ public class Folder {
 
     public Folder() {
     }
+    public Folder(String name) {
+        this.name = name;
+
+    }
     public Folder(String name, String owner) {
         this.name = name;
         this.owner = owner;
@@ -31,7 +35,7 @@ public class Folder {
         this.name = name;
     }
 
-    @XmlAttribute
+    @XmlElement
     public Integer getId() {
         return id;
     }
