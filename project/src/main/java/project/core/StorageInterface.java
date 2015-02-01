@@ -25,5 +25,5 @@ public interface StorageInterface {
     long getFreeScape(String user);
     Boolean checkIfFolderExists(int folderId, String user);
     void shareFile(Integer fileId, String owner, Set<User> users);
-
+    void moveFile(SingleFile file, String user);
 }

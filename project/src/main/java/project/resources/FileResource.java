@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import project.core.StorageService;
+import project.core.dataClasses.Folder;
 import project.core.dataClasses.SingleFile;
 import project.core.dataClasses.User;
 import project.core.exceptions.FileNotFoundException;
@@ -36,7 +37,7 @@ public class FileResource {
                                @FormDataParam("file") FormDataContentDisposition fileDisposition,
                                @Context SecurityContext sc) {
         if (fileInputStream == null) {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
                     .entity("No file")
                     .build());
         }
@@ -62,7 +63,7 @@ public class FileResource {
                                @FormDataParam("file") FormDataContentDisposition fileDisposition,
                                @Context SecurityContext sc) {
         if (fileInputStream == null) {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_ACCEPTABLE)
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
                     .entity("No file")
                     .build());
         }
@@ -176,7 +177,30 @@ public class FileResource {
                         .build())
                 .build();
     }
+    @PUT
+    @Path("move")
+    @Consumes({"application/xml", "application/json"})
+    public Response moveFileToFolder(@Context UriInfo uriInfo,
+                              @Context SecurityContext sc, SingleFile file) {
+        if(file.getId() ==null){
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Lack of file id")
+                    .build());
+        }
+        if(file.getFolderId()==null){
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Lack of folder Id")
+                    .build());
+        }
 
+
+
+        storageService.moveFile(file, sc.getUserPrincipal().getName());
+        return Response.created(
+                UriBuilder.fromUri(uriInfo.getRequestUri())
+                        .build())
+                .build();
+    }
     private String computeTag(SingleFile file) {
         return file.hashCode() + "";
     }
