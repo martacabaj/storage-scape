@@ -82,7 +82,7 @@ public class InMemoryStorage implements StorageInterface {
         Set<SingleFile> filesToReturn = new HashSet<SingleFile>();
         for (SingleFile file : files.values()) {
             String owner = file.getOwner();
-            if (owner.equals(user)) {
+            if (owner.equals(user) || (file.getSharedUsers()!=null&&file.getSharedUsers().contains(user))) {
                 filesToReturn.add(file);
             }
         }
@@ -101,7 +101,7 @@ public class InMemoryStorage implements StorageInterface {
         for (SingleFile file : files.values()) {
             String owner = file.getOwner();
 
-            if (file.getFolderId() == folderId && owner.equals(user)) {
+            if (file.getFolderId() == folderId && owner.equals(user)||(file.getFolderId() == folderId&&file.getSharedUsers()!=null&&file.getSharedUsers().contains(user))) {
                 filesFromFolder.add(file);
             }
         }
@@ -125,9 +125,10 @@ public class InMemoryStorage implements StorageInterface {
     @Override
     public SingleFile getOneFile(Integer id, String user) {
         if (files.containsKey(id)) {
-            String owner = files.get(id).getOwner();
-            if (owner.equals(user))
-                return files.get(id);
+            SingleFile file = files.get(id);
+            String owner = file.getOwner();
+            if(owner.equals(user)|| (file.getSharedUsers()!=null&&file.getSharedUsers().contains(user)))
+                return file;
         }
         return null;
 
