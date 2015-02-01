@@ -8,7 +8,7 @@ public class ClientUtils {
     public static final String STORAGE_PATH = "storage/free";
     public static final String FILE_PATH = "file";
     public static final String FOLDER_PATH= "folder";
-
+//TODO add another paths
     private ClientUtils() {
     }
 
