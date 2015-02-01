@@ -221,25 +221,25 @@ public class InMemoryStorage implements StorageInterface {
             }
         }
     }
-
-    @Override
-    public void shareFolder(Integer folderId, String owner, Set<User> users) {
-        if (!folders.containsKey(folderId)) {
-            throw new FolderNotFoundException(folderId);
-        } else {
-            Folder folder = folders.get(folderId);
-            String fileOwner = folder.getOwner();
-            if (fileOwner.equals(owner)) {
-                for (User user : users) {
-
-                    folder.addSharedUser(user.getUsername());
-                    for(SingleFile file : files.values()){
-
-                    }
-                }
-            } else {
-                throw new FileNotFoundException(folderId);
-            }
-        }
-    }
+//
+//    @Override
+//    public void shareFolder(Integer folderId, String owner, Set<User> users) {
+//        if (!folders.containsKey(folderId)) {
+//            throw new FolderNotFoundException(folderId);
+//        } else {
+//            Folder folder = folders.get(folderId);
+//            String fileOwner = folder.getOwner();
+//            if (fileOwner.equals(owner)) {
+//                for (User user : users) {
+//
+//                    folder.addSharedUser(user.getUsername());
+//                    for(SingleFile file : files.values()){
+//
+//                    }
+//                }
+//            } else {
+//                throw new FileNotFoundException(folderId);
+//            }
+//        }
+//    }
 }
